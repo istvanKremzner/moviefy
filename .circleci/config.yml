@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build:
+  Fetch-Code:
     docker:
       - image: cimg/base:2021.04
         auth:
@@ -9,14 +9,81 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Type-check
-          command: npm run type-check
+          name: Getting the Code
+          command: echo 'Cloning repo...'
+  Using-Node:
+    docker:
+      - image: cimg/node:16.17.0
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD # context / project UI env-var reference
+    steps:
       - run:
-          name: Lint
+          name: Running the Node Container
+          command: node -v
+  Lint:
+    docker:
+      - image: cimg/node:16.17.0
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
+    steps:
+      - run:
+          name: Running linter on the project
           command: npm run lint
+  TypeCheck:
+    docker:
+      - image: cimg/node:16.17.0
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
+    steps:
       - run:
-          name: Build
+          name: Running type checking on the project
+          command: npm run type-check
+  Build:
+    docker:
+      - image: cimg/node:16.17.0
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
+    steps:
+      - run:
+          name: Building the project
           command: npm run build
+  Test:
+    docker:
+      - image: cimg/node:16.17.0
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD
+    steps:
       - run:
-          name: Test
-          command: npm run test:ci
+          name: Running the unit tests
+          command: npm run test
+
+workflows:
+  Build-Workflow:
+    jobs:
+      - Fetch-Code
+      - Using-Node:
+          requires:
+            - Fetch-Code
+      - Lint:
+          requires:
+            - Fetch-Code
+            - Using-Node
+      - TypeCheck:
+          requires:
+            - Fetch-Code
+            - Using-Node
+      - Build:
+          requires:
+            - Fetch-Code
+            - Using-Node
+            - TypeCheck
+      - Test:
+          requires:
+            - Fetch-Code
+            - Using-Node
+            - TypeCheck
