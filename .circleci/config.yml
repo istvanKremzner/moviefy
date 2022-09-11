@@ -13,32 +13,7 @@ jobs:
           command: |
             npm ci
             node -v
-  Lint:
-    docker:
-      - image: cimg/node:16.17.0
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD
-    steps:
-      - checkout
-      - run:
-          name: Running linter on the project
-          command: |
-            npm ci
-            npm run lint
-  Type-Check:
-    docker:
-      - image: cimg/node:16.17.0
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD
-    steps:
-      - checkout
-      - run:
-          name: Running type checking on the project
-          command: |
-            npm ci
-            npm run type-check
+
   Build:
     docker:
       - image: cimg/node:16.17.0
@@ -70,15 +45,9 @@ workflows:
   Build-Workflow:
     jobs:
       - Setup-Project
-      - Lint:
-          requires:
-            - Setup-Project
-      - Type-Check:
-          requires:
-            - Setup-Project
       - Build:
           requires:
-            - Type-Check
+            - Setup-Project
       - Test:
           requires:
-            - Type-Check
+            - Setup-Project

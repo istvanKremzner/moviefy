@@ -10,13 +10,12 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
 
-    "type-check": "tsc",
-
     "test": "jest",
     "test:watch": "jest --watchAll",
     "test:ci": "jest --ci"
   },
   "dependencies": {
+    "@babel/preset-env": "^7.19.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
