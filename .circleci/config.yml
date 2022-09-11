@@ -9,7 +9,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Running the Node Container
+          name: Setting up the project environment
           command: |
             npm ci
             node -v
