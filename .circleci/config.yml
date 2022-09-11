@@ -1,26 +1,18 @@
 version: 2.1
 jobs:
-  Fetch-Code:
-    docker:
-      - image: cimg/base:2021.04
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD # context / project UI env-var reference
-    steps:
-      - checkout
-      - run:
-          name: Getting the Code
-          command: echo 'Cloning repo...'
-  Using-Node:
+  Setup-Project:
     docker:
       - image: cimg/node:16.17.0
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD # context / project UI env-var reference
     steps:
+      - checkout
       - run:
           name: Running the Node Container
-          command: node -v
+          command: |
+            npm ci
+            node -v
   Lint:
     docker:
       - image: cimg/node:16.17.0
@@ -28,19 +20,25 @@ jobs:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
     steps:
+      - checkout
       - run:
           name: Running linter on the project
-          command: npm run lint
-  TypeCheck:
+          command: |
+            npm ci
+            npm run lint
+  Type-Check:
     docker:
       - image: cimg/node:16.17.0
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
     steps:
+      - checkout
       - run:
           name: Running type checking on the project
-          command: npm run type-check
+          command: |
+            npm ci
+            npm run type-check
   Build:
     docker:
       - image: cimg/node:16.17.0
@@ -48,9 +46,12 @@ jobs:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
     steps:
+      - checkout
       - run:
           name: Building the project
-          command: npm run build
+          command: |
+            npm ci
+            npm run build
   Test:
     docker:
       - image: cimg/node:16.17.0
@@ -58,32 +59,26 @@ jobs:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD
     steps:
+      - checkout
       - run:
           name: Running the unit tests
-          command: npm run test
+          command: |
+            npm ci
+            npm run test
 
 workflows:
   Build-Workflow:
     jobs:
-      - Fetch-Code
-      - Using-Node:
-          requires:
-            - Fetch-Code
+      - Setup-Project
       - Lint:
           requires:
-            - Fetch-Code
-            - Using-Node
-      - TypeCheck:
+            - Setup-Project
+      - Type-Check:
           requires:
-            - Fetch-Code
-            - Using-Node
+            - Setup-Project
       - Build:
           requires:
-            - Fetch-Code
-            - Using-Node
-            - TypeCheck
+            - Type-Check
       - Test:
           requires:
-            - Fetch-Code
-            - Using-Node
-            - TypeCheck
+            - Type-Check
