@@ -6,8 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+
     "lint": "next lint",
     "lint:fix": "next lint --fix",
+
+    "type-check": "tsc",
+
     "test": "jest",
     "test:watch": "jest --watchAll",
     "test:ci": "jest --ci"

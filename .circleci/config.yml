@@ -9,12 +9,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: The First Step
-          command: |
-            echo 'Hello World!'
-            echo 'This is the delivery pipeline'
+          name: Type-check
+          command: npm run type-check
       - run:
-          name: The Second Step
-          command: |
-            ls -al
-            echo '^^^The files in your repo^^^'
+          name: Lint
+          command: npm run lint
+      - run:
+          name: Build
+          command: npm run build
+      - run:
+          name: Test
+          command: npm run test:ci
