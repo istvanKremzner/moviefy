@@ -39,7 +39,7 @@ jobs:
           name: Running the unit tests
           command: |
             npm ci
-            npm run test
+            npm run test:ci
 
 workflows:
   Build-Workflow:
